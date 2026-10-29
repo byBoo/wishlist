@@ -544,69 +544,86 @@
         }
 
 
-        // Умный декодер латинских ссылок Ozon и DNS в русский текст + словарь брендов
+
+        // Расширенный словарь транслитерации и терминов для Ozon и DNS
         function decodeSlugToRussian(slug) {
             if (!slug) return '';
             let s = slug.toLowerCase();
-            // Убираем ID артикула в конце
             s = s.replace(/-\d{6,12}$/, '');
             
             const dict = {
                 'vr': 'VR', 'shlem': 'шлем', 'ochki': 'очки', 'oculus': 'Oculus', 'quest': 'Quest',
                 'globalnaya': 'глобальная', 'versiya': 'версия', 'mach': 'мАч', 'gb': 'ГБ', 'tb': 'ТБ',
                 'besprovodnoj': 'беспроводной', 'provodnoj': 'проводной', 'besprovodnye': 'беспроводные',
-                'naushniki': 'наушники', 'gejmpad': 'геймпад', 'dzhojstik': 'джойстик',
+                'besprovodnojprovodnoj': 'беспроводной/проводной', 'radiokanal': 'радиоканал',
+                'naushniki': 'наушники', 'garnitura': 'гарнитура', 'gejmpad': 'геймпад', 'dzhojstik': 'джойстик',
                 'klaviatura': 'клавиатура', 'mysh': 'мышь', 'igrovaya': 'игровая', 'igrovoj': 'игровой',
                 'monitor': 'монитор', 'chernyj': 'черный', 'cernyj': 'черный', 'belyj': 'белый',
-                'fioletovyj': 'фиолетовый', 'serый': 'серый', 'seryj': 'серый', 'sinij': 'синий',
+                'fioletovyj': 'фиолетовый', 'seryj': 'серый', 'serebristyj': 'серебристый', 'sinij': 'синий',
                 'krasnyj': 'красный', 'rozovyj': 'розовый', 'zelenyj': 'зеленый', 'zolotoj': 'золотой',
-                'serebristyj': 'серебристый', 'krossovki': 'кроссовки', 'muzhskie': 'мужские',
+                'zheltyj': 'желтый', 'oranzhevyj': 'оранжевый', 'bezhevyj': 'бежевый', 'korichnevyj': 'коричневый',
+                'krossovki': 'кроссовки', 'kedy': 'кеды', 'botinki': 'ботинки', 'muzhskie': 'мужские',
                 'zhenskie': 'женские', 'futbolka': 'футболка', 'tolstovka': 'толстовка', 'hudi': 'худи',
-                'kurtka': 'куртка', 'sumka': 'сумка', 'ryukzak': 'рюкзак', 'chasy': 'часы',
+                'kurtka': 'куртка', 'sumka': 'сумка', 'ryukzak': 'рюкзак', 'chasy': 'часы', 'smart': 'смарт',
                 'smartfon': 'смартфон', 'telefon': 'телефон', 'planshet': 'планшет', 'noutbuk': 'ноутбук',
-                'videokarta': 'видеокарта', 'processor': 'процессор', 'kreslo': 'кресло', 'stul': 'стул',
-                'kolonka': 'колонка', 'умная': 'умная', 'umnaya': 'умная', 'stanciya': 'станция',
-                'yandeks': 'Яндекс', 'alisa': 'Алиса', 'alisoj': 'Алисой', 'dlya': 'для',
-                'nabor': 'набор', 'podstavka': 'подставка', 'derzhatel': 'держатель', 'zaryadnoe': 'зарядное',
-                'ustrojstvo': 'устройство', 'kabel': 'кабель', 'chehol': 'чехол', 'steklo': 'стекло',
+                'videokarta': 'видеокарта', 'processor': 'процессор', 'materinskaya': 'материнская', 'plata': 'плата',
+                'operativnaya': 'оперативная', 'pamyat': 'память', 'nakopitel': 'накопитель', 'zhestkij': 'жесткий',
+                'disk': 'диск', 'korpus': 'корпус', 'blok': 'блок', 'pitaniya': 'питания', 'kuler': 'кулер',
+                'sistema': 'система', 'ohlazhdeniya': 'охлаждения', 'zhidkostnogo': 'жидкостного',
+                'kreslo': 'кресло', 'stul': 'стул', 'stol': 'стол', 'kompyuternyj': 'компьютерный',
+                'kolonka': 'колонка', 'portativnaya': 'портативная', 'umnaya': 'умная', 'stanciya': 'станция',
+                'yandeks': 'Яндекс', 'alisa': 'Алиса', 'alisoj': 'Алисой', 'dlya': 'для', 's': 'с', 'i': 'и',
+                'nabor': 'набор', 'podstavka': 'подставка', 'derzhatel': 'держатель', 'kronshtejn': 'кронштейн',
+                'zaryadnoe': 'зарядное', 'ustrojstvo': 'устройство', 'setevoe': 'сетевое', 'kabel': 'кабель',
+                'adapter': 'адаптер', 'perehodnik': 'переходник', 'chehol': 'чехол', 'steklo': 'стекло',
                 'zashchitnoe': 'защитное', 'poverbank': 'повербанк', 'vneshnij': 'внешний', 'akkumulyator': 'аккумулятор',
-                'kofemashina': 'кофемашина', 'chajnik': 'чайник', 'fen': 'фен', 'stajler': 'стайлер',
+                'kofemashina': 'кофемашина', 'kofevarka': 'кофеварка', 'chajnik': 'чайник', 'elektrochajnik': 'электрочайник',
+                'fen': 'фен', 'stajler': 'стайлер', 'vypryamitel': 'выпрямитель', 'pylesos': 'пылесос',
+                'robot': 'робот', 'uvlazhnitel': 'увлажнитель', 'vozduha': 'воздуха', 'mikrovolnovaya': 'микроволновая',
+                'pech': 'печь', 'blender': 'блендер', 'mikser': 'миксер', 'toster': 'тостер', 'gril': 'гриль',
                 'parfyumernaya': 'парфюмерная', 'tualetnaya': 'туалетная', 'voda': 'вода', 'duhi': 'духи',
-                'krem': 'крем', 'syvorotka': 'сыворотка', 'maska': 'маска', 'shampun': 'шампунь',
+                'krem': 'крем', 'syvorotka': 'сыворотка', 'maska': 'маска', 'shampun': 'шампунь', 'gel': 'гель',
                 'svecha': 'свеча', 'aromaticheskaya': 'ароматическая', 'diffuzor': 'диффузор',
-                'pleed': 'плед', 'pled': 'плед', 'podushka': 'подушка', 'kruzhka': 'кружка',
-                'termokruzhka': 'термокружка', 'termos': 'термос', 'miski': 'миски', 'miska': 'миска',
-                'keramicheskie': 'керамические', 'koshki': 'кошки', 'sobak': 'собак'
+                'pled': 'плед', 'podushka': 'подушка', 'odeyalo': 'одеяло', 'postelnoe': 'постельное', 'bele': 'белье',
+                'kruzhka': 'кружка', 'termokruzhka': 'термокружка', 'termos': 'термос', 'bokal': 'бокал',
+                'miski': 'миски', 'miska': 'миска', 'keramicheskie': 'керамические', 'koshki': 'кошки', 'sobak': 'собак',
+                'igrushka': 'игрушка', 'myagkaya': 'мягкая', 'konstruktor': 'конструктор', 'nastolnaya': 'настольная', 'igra': 'игра',
+                'mikrofon': 'микрофон', 'veb': 'веб', 'kamera': 'камера', 'kovrik': 'коврик', 'podsvetka': 'подсветка',
+                'lenta': 'лента', 'svetodiodnaya': 'светодиодная', 'lampa': 'лампа', 'nochnik': 'ночник', 'proektor': 'проектор'
             };
 
-            const keepUpper = new Set(['vr', 'gb', 'tb', 'usb', 'rgb', 'led', 'ips', 'oled', 'qhd', 'uhd', '4k', '2k', 'pro', 'max', 'ultra', 'plus', 'mini', 'air', 'se', 'rog', 'rtx', 'gtx', 'amd', 'ryzen', 'intel', 'core', 'ps5', 'ps4', 'xbox', 'tws', 'anc', 'wifi', 'bluetooth']);
+            const keepUpper = new Set(['vr', 'gb', 'tb', 'usb', 'rgb', 'led', 'ips', 'va', 'oled', 'qhd', 'uhd', 'fhd', '4k', '2k', 'pro', 'max', 'ultra', 'plus', 'mini', 'air', 'se', 'rog', 'tuf', 'rtx', 'gtx', 'rx', 'amd', 'ryzen', 'intel', 'core', 'ps5', 'ps4', 'xbox', 'tws', 'anc', 'wifi', 'bt', 'bluetooth', 'ssd', 'hdd', 'nvme', 'm2', 'dpi', 'hz', 'gc']);
             const brands = {
                 'apple': 'Apple', 'iphone': 'iPhone', 'ipad': 'iPad', 'airpods': 'AirPods', 'macbook': 'MacBook',
                 'samsung': 'Samsung', 'odyssey': 'Odyssey', 'galaxy': 'Galaxy', 'xiaomi': 'Xiaomi', 'redmi': 'Redmi',
-                'poco': 'POCO', 'asus': 'ASUS', 'msi': 'MSI', 'gigabyte': 'Gigabyte', 'palit': 'Palit',
-                'logitech': 'Logitech', 'razer': 'Razer', 'hyperx': 'HyperX', 'steelseries': 'SteelSeries',
+                'poco': 'POCO', 'asus': 'ASUS', 'msi': 'MSI', 'gigabyte': 'Gigabyte', 'palit': 'Palit', 'sapphire': 'Sapphire',
+                'logitech': 'Logitech', 'razer': 'Razer', 'hyperx': 'HyperX', 'steelseries': 'SteelSeries', 'corsair': 'Corsair',
+                'ardor': 'ARDOR', 'gaming': 'GAMING', 'dark': 'Dark', 'project': 'Project', 'ajazz': 'Ajazz', 'aula': 'AULA',
                 '8bitdo': '8BitDo', 'sony': 'Sony', 'playstation': 'PlayStation', 'dualsense': 'DualSense',
                 'nintendo': 'Nintendo', 'switch': 'Switch', 'steam': 'Steam', 'deck': 'Deck',
-                'dyson': 'Dyson', 'philips': 'Philips', 'tefal': 'Tefal', 'kitfort': 'Kitfort',
+                'dyson': 'Dyson', 'philips': 'Philips', 'tefal': 'Tefal', 'kitfort': 'Kitfort', 'delonghi': 'DeLonghi',
                 'asics': 'ASICS', 'nike': 'Nike', 'adidas': 'Adidas', 'new': 'New', 'balance': 'Balance',
                 'puma': 'Puma', 'reebok': 'Reebok', 'vans': 'Vans', 'converse': 'Converse',
-                'adria': 'ADRIA', 'finick': 'Finick', 'falto': 'FALTO', 'meta': 'Meta', 'snapdragon': 'Snapdragon'
+                'adria': 'ADRIA', 'finick': 'Finick', 'falto': 'FALTO', 'meta': 'Meta', 'snapdragon': 'Snapdragon',
+                'jbl': 'JBL', 'marshall': 'Marshall', 'fifine': 'Fifine', 'maono': 'Maono', 'lg': 'LG', 'aoc': 'AOC',
+                'benq': 'BenQ', 'acer': 'Acer', 'lenovo': 'Lenovo', 'legion': 'Legion', 'huawei': 'HUAWEI', 'honor': 'HONOR',
+                'baseus': 'Baseus', 'ugreen': 'Ugreen', 'anker': 'Anker', 'lego': 'LEGO'
             };
 
             const translitWord = (w) => {
                 if (dict[w]) return dict[w];
                 if (brands[w]) return brands[w];
                 if (keepUpper.has(w)) return w.toUpperCase();
+                // Модели и коды типа g50sf, s27fg502si, 5090, xr2
                 if (/^\d+$/.test(w) || /^[a-z]+\d+[a-z0-9]*$/i.test(w) || /^\d+[a-z]+$/i.test(w)) {
                     return w.toUpperCase();
                 }
-                // Если это похоже на русское слово латиницей — транслитерируем
                 let res = w;
                 const multi = [
                     ['shch', 'щ'], ['sch', 'щ'], ['yo', 'ё'], ['zh', 'ж'], ['kh', 'х'],
                     ['ts', 'ц'], ['ch', 'ч'], ['sh', 'ш'], ['yu', 'ю'], ['ya', 'я'],
                     ['iy', 'ий'], ['yj', 'ый'], ['oj', 'ой'], ['aj', 'ай'], ['ej', 'ей'],
-                    ['uj', 'уй'], ['yu', 'ю'], ['ya', 'я']
+                    ['uj', 'уй'], ['ogo', 'ого'], ['aya', 'ая'], ['oe', 'ое'], ['ye', 'ые']
                 ];
                 for (const [k, v] of multi) res = res.replaceAll(k, v);
                 const single = {
@@ -627,7 +644,162 @@
             return sentence;
         }
 
-        // Проверка: не подсунул ли антибот Ozon/DNS заглушку или странную иконку
+        // Интеллектуальный подбор красивой фотографии, описания и метки по названию товара!
+        function getSmartCategoryProfile(title, store, article) {
+            const t = (title || '').toLowerCase();
+            const artText = article ? ` (арт. ${article})` : '';
+
+            const profiles = [
+                {
+                    keys: ['видеокарт', 'rtx', 'geforce', 'radeon', 'gtx', 'videokarta'],
+                    tag: 'Апгрейд ПК 🚀',
+                    img: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=85',
+                    desc: `Мощное графическое ускорение для максимального FPS и ультра-настроек в любых играх! Настоящая мечта под новогоднюю ёлку 🚀🎮`
+                },
+                {
+                    keys: ['монитор', 'monitor', 'odyssey', 'qhd', 'uhd', 'экран', 'дисплей'],
+                    tag: 'Сочная картинка 🖥️',
+                    img: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=85',
+                    desc: `Чёткая и плавная картинка, глубокие цвета и полное погружение в любимые игры, фильмы и проекты! 🖥️✨`
+                },
+                {
+                    keys: ['геймпад', 'джойстик', '8bitdo', 'dualsense', 'xbox', 'контроллер', 'gejmpad'],
+                    tag: 'Для уютных каток 🎮',
+                    img: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=800&q=85',
+                    desc: `Удобный и отзывчивый контроллер, который идеально лежит в руках — то что нужно для новогодних игровых марафонов! 🎮🔥`
+                },
+                {
+                    keys: ['клавиатур', 'klaviatura', 'keycap', 'механическ'],
+                    tag: 'Тайпинг и стиль ⌨️',
+                    img: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=85',
+                    desc: `Приятнейший ход клавиш, стильная подсветка и максимальный комфорт как в динамичных катках, так и за работой! ⌨️✨`
+                },
+                {
+                    keys: ['мышь', 'мышка', 'mysh', 'logitech g', 'razer', 'сенсор'],
+                    tag: 'Точный прицел 🖱️',
+                    img: 'https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=800&q=85',
+                    desc: `Лёгкая, точная и эргономичная мышка с отличным сенсором для победных каток и комфортной работы за ПК! 🖱️⚡`
+                },
+                {
+                    keys: ['наушник', 'гарнитур', 'airpods', 'tws', 'naushniki', 'marshall', 'sony wh'],
+                    tag: 'Чистый звук 🎧',
+                    img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=85',
+                    desc: `Объёмное и чистое звучание для любимой музыки, полного погружения в игры и новогоднего настроения без лишнего шума! 🎧🎵`
+                },
+                {
+                    keys: ['vr', 'шлем', 'oculus', 'quest', 'виртуальн'],
+                    tag: 'Виртуальная реальность 🥽',
+                    img: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=800&q=85',
+                    desc: `Билет в другие миры прямо из дома! Полное погружение в VR-игры и интерактивные приключения на каникулах 🥽🌌`
+                },
+                {
+                    keys: ['кресло', 'стул', 'falto', 'kreslo', 'трон'],
+                    tag: 'Максимальный комфорт 💺',
+                    img: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?auto=format&fit=crop&w=800&q=85',
+                    desc: `Эргономичная поддержка спины и королевский комфорт для долгих вечеров за компьютером и отдыха! 💺👑`
+                },
+                {
+                    keys: ['кроссовк', 'кеды', 'ботинк', 'обувь', 'asics', 'nike', 'adidas', 'new balance', 'krossovki'],
+                    tag: 'Стильный шаг 👟',
+                    img: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=800&q=85',
+                    desc: `Стильная, лёгкая и суперудобная пара обуви с отличной амортизацией для прогулок и приключений в новом году! 👟🔥`
+                },
+                {
+                    keys: ['худи', 'толстовк', 'футболк', 'куртк', 'свитер', 'одежд', 'пижам', 'халат', 'плед'],
+                    tag: 'Уют и стиль 🧥',
+                    img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=85',
+                    desc: `Тёплый, мягкий и очень уютный подарок, который будет радовать и согревать всю зиму! 🧣❄️`
+                },
+                {
+                    keys: ['духи', 'парфюм', 'туалетная вода', 'крем', 'сыворотк', 'маска', 'шампунь', 'косметик', 'бьюти', 'dyson', 'фен', 'стайлер'],
+                    tag: 'Красота и уход 💖',
+                    img: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=85',
+                    desc: `Желанный бьюти-подарок для заботы о себе, прекрасного настроения и праздничного сияния каждый день! 💖✨`
+                },
+                {
+                    keys: ['кофе', 'чайник', 'кружк', 'термос', 'бокал', 'посуд', 'кухн', 'блендер', 'тостер', 'гриль', 'аэрогриль'],
+                    tag: 'Вкус и уют ☕',
+                    img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=85',
+                    desc: `Для самых уютных зимних вечеров, ароматных напитков и кулинарных шедевров в домашней атмосфере! ☕🎄`
+                },
+                {
+                    keys: ['кошк', 'кот', 'собак', 'миск', 'finick', 'когтеточк', 'лежанк', 'питомц'],
+                    tag: 'Пушистому боссу 🐾',
+                    img: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=85',
+                    desc: `Стильный и полезный подарок для главного пушистого хозяина дома — чтобы у котика тоже был настоящий Новый год! 🐱🐾`
+                },
+                {
+                    keys: ['смартфон', 'телефон', 'iphone', 'samsung galaxy', 'xiaomi', 'poco', 'планшет', 'ipad'],
+                    tag: 'Топ-гаджет 📱',
+                    img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=85',
+                    desc: `Современный, быстрый и яркий гаджет, который всегда под рукой — супер-подарок под ёлочку! 📱✨`
+                },
+                {
+                    keys: ['часы', 'watch', 'браслет'],
+                    tag: 'Стильный аксессуар ⌚',
+                    img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85',
+                    desc: `Стильный и функциональный аксессуар на каждый день, который отлично дополнит любой образ! ⌚✨`
+                },
+                {
+                    keys: ['колонка', 'станция', 'алиса', 'яндекс', 'jbl', 'звук'],
+                    tag: 'Музыка и умный дом 🔊',
+                    img: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=85',
+                    desc: `Для атмосферной музыки, управления умным домом и создания праздничного настроения в любой момент! 🔊🎶`
+                },
+                {
+                    keys: ['микрофон', 'веб-камер', 'стрим', 'fifine', 'подсветк', 'лампа', 'ночник', 'свеча', 'диффузор'],
+                    tag: 'Атмосфера и уют ✨',
+                    img: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=800&q=85',
+                    desc: `Добавит максимум уюта, качественного звука или тёплого света в рабочее и игровое пространство! ✨🎄`
+                },
+                {
+                    keys: ['ssd', 'диск', 'память', 'флешк', 'повербанк', 'аккумулятор', 'заряд', 'кабель', 'процессор', 'кулер', 'корпус'],
+                    tag: 'Полезное железо ⚡',
+                    img: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=85',
+                    desc: `Незаменимая вещь для прокачки сетапа, высокой скорости работы и надёжности каждый день! ⚡🔧`
+                },
+                {
+                    keys: ['конструктор', 'lego', 'настольн', 'игр', 'пазл', 'игрушк'],
+                    tag: 'Для души и фана 🎲',
+                    img: 'https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?auto=format&fit=crop&w=800&q=85',
+                    desc: `Отличный повод собраться вместе на новогодних праздниках или с удовольствием провести вечер! 🎲🎄`
+                },
+                {
+                    keys: ['сумк', 'рюкзак', 'кошелек', 'обложк', 'украшен', 'кольц', 'серьг', 'подвеск', 'цепочк'],
+                    tag: 'Красивый аксессуар 👜',
+                    img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=85',
+                    desc: `Элегантный и практичный аксессуар, который будет радовать глаз и дополнять любимые образы! ✨👜`
+                }
+            ];
+
+            for (const p of profiles) {
+                if (p.keys.some(k => t.includes(k))) {
+                    return p;
+                }
+            }
+
+            // Если категория не угадана по словам — выдаём профиль по магазину
+            if (store === 'dns') {
+                return {
+                    tag: 'Техника из DNS ⚡',
+                    img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=85',
+                    desc: `Желанный гаджет из списка покупок в DNS${artText}. Точно пригодится и порадует в новом году! ⚡🎄`
+                };
+            }
+            if (store === 'ozon') {
+                return {
+                    tag: 'Ozon Хотелка 🎁',
+                    img: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=85',
+                    desc: `Классная и очень нужная хотелка с Ozon${artText}. Переходите по кнопке прямо на страницу товара! 🎁💙`
+                };
+            }
+            return {
+                tag: 'Новогодняя хотелка ✨',
+                img: 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=800&q=85',
+                desc: `Очень желанный подарок под новогоднюю ёлочку${artText}! Подарит море радости и праздничного настроения 🎄✨`
+            };
+        }
+
         function isBadScrapedTitle(t) {
             if (!t) return true;
             const low = t.toLowerCase();
@@ -637,12 +809,14 @@
                    low.includes('доступ ограничен') ||
                    low.includes('почти готово') ||
                    low.includes('вы почти') ||
-                   low.includes('подтвердите, что вы') ||
+                   low.includes('подтвердите') ||
                    low.includes('ozon.ru — интернет-магазин') ||
                    low === 'ozon' ||
                    low === 'dns' ||
                    low.includes('cloudflare') ||
-                   low.includes('attention required');
+                   low.includes('attention required') ||
+                   low.includes('403 forbidden') ||
+                   low.includes('access denied');
         }
 
         function isBadScrapedImage(url) {
@@ -656,40 +830,13 @@
                    low.includes('ozon-logo') ||
                    low.includes('default-share') ||
                    low.includes('1x1') ||
-                   low.includes(' blank') ||
+                   low.includes('blank') ||
                    low.endsWith('.svg') ||
-                   low.includes('static.ozon.ru/graphics');
+                   low.includes('static.ozon.ru/graphics') ||
+                   low.includes('dns-shop.ru/static');
         }
 
-        // Генерация красивой тематической SVG-обложки для Ozon / DNS, если антибот скрыл фото товара
-        function makeSmartStoreCoverSvg(store, title, article) {
-            const safeTitle = (title || 'Желанный подарок').slice(0, 42);
-            const safeArt = article ? `Артикул: ${article}` : (store === 'ozon' ? 'Ozon Хотелка' : 'DNS Хотелка');
-            const bg1 = store === 'ozon' ? '#005bff' : (store === 'dns' ? '#f59e0b' : '#7c3aed');
-            const bg2 = store === 'ozon' ? '#1e1b4b' : (store === 'dns' ? '#451a03' : '#311042');
-            const badge = store === 'ozon' ? 'OZON ПОДАРОК 🎁' : (store === 'dns' ? 'DNS ТЕХНИКА ⚡' : 'ПОДАРОК 🎄');
-
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
-                <defs>
-                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stop-color="${bg1}"/>
-                        <stop offset="65%" stop-color="${bg2}"/>
-                        <stop offset="100%" stop-color="#090d16"/>
-                    </linearGradient>
-                </defs>
-                <rect width="600" height="400" fill="url(#g)"/>
-                <circle cx="510" cy="80" r="130" fill="#ffffff" opacity="0.08"/>
-                <circle cx="90" cy="330" r="150" fill="#ffffff" opacity="0.06"/>
-                <rect x="60" y="95" width="480" height="210" rx="28" fill="#0f172a" fill-opacity="0.72" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2"/>
-                <rect x="200" y="122" width="200" height="34" rx="17" fill="${bg1}"/>
-                <text x="300" y="145" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-weight="bold" font-size="15" text-anchor="middle" letter-spacing="1">${badge}</text>
-                <text x="300" y="205" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-weight="bold" font-size="22" text-anchor="middle">${safeTitle.replace(/[<>&"]/g, '')}</text>
-                <text x="300" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="16" text-anchor="middle">${safeArt}</text>
-            </svg>`;
-            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-        }
-
-        // Обработка вставки картинки из буфера обмена (Ctrl+V) или выбора файла с телефона/ПК (сжатие в легкий JPEG)
+        // Сжатие загружаемого с телефона/ПК фото или скриншота
         function compressImageFileToDataUrl(file, callback) {
             if (!file) return;
             const reader = new FileReader();
@@ -706,8 +853,7 @@
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-                    callback(dataUrl);
+                    callback(canvas.toDataURL('image/jpeg', 0.82));
                 };
                 img.src = e.target.result;
             };
@@ -719,10 +865,9 @@
             if (!file) return;
             compressImageFileToDataUrl(file, (dataUrl) => {
                 document.getElementById(targetInputId).value = dataUrl;
-                showToast('Картинка загружена и сжата! 📸', 'fa-image');
+                showToast('Картинка загружена! 📸', 'fa-image');
             });
         }
-
 
         async function autoFillFromUrl() {
             let rawInput = document.getElementById('add-url-input').value.trim();
@@ -730,11 +875,11 @@
             const btn = document.getElementById('autofill-btn');
             if (!rawInput) { showToast('Вставьте ссылку или артикул!', 'fa-circle-exclamation'); return; }
             statusEl.classList.remove('hidden');
-            statusEl.textContent = '⏳ Разбираем ссылку и ищем данные товара...';
+            statusEl.textContent = '⏳ Анализируем ссылку, генерируем название, фото и описание...';
             btn.disabled = true;
 
             try {
-                // Если вставили текст из кнопки «Поделиться» в приложении Ozon/WB (где есть и название, и ссылка в одной строке)
+                // Поддержка вставки текста из кнопки «Поделиться» (где есть и название товара, и ссылка)
                 const urlInTextMatch = rawInput.match(/(https?:\/\/[^\s]+)/i);
                 let prefixTextTitle = '';
                 if (urlInTextMatch && rawInput.length > urlInTextMatch[1].length + 5) {
@@ -743,7 +888,7 @@
                     document.getElementById('add-url-input').value = rawInput;
                 }
 
-                // 1. Wildberries (ссылка или артикул)
+                // 1. Wildberries (прямое API WB)
                 const wbMatch = rawInput.match(/catalog\/(\d+)/) || rawInput.match(/^(\d{6,12})$/);
                 if (wbMatch || rawInput.includes('wildberries.ru')) {
                     const nmId = wbMatch ? wbMatch[1] : rawInput.replace(/[^\d]/g, '');
@@ -752,13 +897,15 @@
                     document.getElementById('add-image-input').value = getWbImageUrls(nmId);
                     if (!rawInput.startsWith('http')) document.getElementById('add-url-input').value = `https://www.wildberries.ru/catalog/${nmId}/detail.aspx`;
                     const { basket, vol, part, id } = getWbBasketInfo(nmId);
+                    let wbTitle = prefixTextTitle || '';
+                    let wbDesc = '';
                     try {
                         const cardRes = await fetch(`https://basket-${basket}.wbbasket.ru/vol${vol}/part${part}/${id}/info/ru/card.json`);
                         if (cardRes.ok) {
                             const cardJson = await cardRes.json();
                             const brand = cardJson.selling?.brand_name ? cardJson.selling.brand_name + ' / ' : '';
-                            document.getElementById('add-title-input').value = brand + (cardJson.imt_name || prefixTextTitle || `Товар WB #${nmId}`);
-                            document.getElementById('add-desc-input').value = (cardJson.description || 'Желанный подарок с Wildberries под ёлочку!').slice(0, 220);
+                            wbTitle = brand + (cardJson.imt_name || wbTitle || `Товар WB #${nmId}`);
+                            wbDesc = (cardJson.description || '').slice(0, 220);
                         }
                     } catch(e) {}
                     try {
@@ -769,95 +916,105 @@
                             if (prod) {
                                 const priceRub = Math.round((prod.sizes?.[0]?.price?.product || prod.salePriceU || 0) / 100);
                                 if (priceRub > 0) document.getElementById('add-price-input').value = `~${priceRub.toLocaleString('ru-RU')} ₽`;
-                                if (!document.getElementById('add-title-input').value && prod.name) document.getElementById('add-title-input').value = (prod.brand ? prod.brand + ' ' : '') + prod.name;
+                                if (!wbTitle && prod.name) wbTitle = (prod.brand ? prod.brand + ' ' : '') + prod.name;
                             }
                         }
                     } catch(e) {}
-                    statusEl.textContent = '✅ Данные Wildberries успешно загружены!';
+                    const prof = getSmartCategoryProfile(wbTitle, 'wb', nmId);
+                    document.getElementById('add-title-input').value = wbTitle || `Подарок с Wildberries (${nmId})`;
+                    document.getElementById('add-desc-input').value = wbDesc || prof.desc;
+                    document.getElementById('add-spec-input').value = prof.tag;
+                    statusEl.textContent = '✅ Товар с Wildberries полностью загружен (название, фото, цена и описание)!';
                     btn.disabled = false;
                     return;
                 }
 
-                // 2. Ozon или DNS
+                // 2. Разбор ссылок Ozon и DNS (любые форматы ссылок, включая /characteristics/, мобильные и поисковые)
                 let store = 'ozon';
                 let article = '';
                 let slugTitle = '';
 
-                if (rawInput.includes('ozon.ru') || rawInput.includes('ozon.by') || rawInput.includes('ozon.kz')) {
+                if (rawInput.includes('dns-shop.ru')) {
+                    store = 'dns';
+                    document.getElementById('add-store-input').value = 'dns';
+                    try {
+                        const u = new URL(rawInput);
+                        const segs = u.pathname.split('/').filter(Boolean);
+                        // Ищем самый длинный сегмент с дефисами (это всегда транслит-название товара в DNS)
+                        const slugCandidates = segs.filter(s => s.includes('-') && !['product', 'characteristics', 'opinion', 'communicator'].includes(s));
+                        if (slugCandidates.length > 0) {
+                            slugCandidates.sort((a, b) => b.length - a.length);
+                            slugTitle = decodeSlugToRussian(slugCandidates[0]);
+                        }
+                        if (u.searchParams.get('q')) {
+                            article = u.searchParams.get('q');
+                        }
+                    } catch (e) {}
+                    if (!article) {
+                        const codeMatch = rawInput.match(/\/product\/(?:characteristics\/)?([a-z0-9]{8,20})\//i);
+                        if (codeMatch) article = codeMatch[1].slice(0, 8);
+                    }
+                    if (article) document.getElementById('add-article-input').value = article;
+                } else if (rawInput.includes('ozon.')) {
                     store = 'ozon';
                     document.getElementById('add-store-input').value = 'ozon';
-                    // Вытаскиваем артикул и человекочитаемое название из URL Ozon
-                    const prodSlugMatch = rawInput.match(/\/product\/([a-z0-9-]+?)-(\d{6,12})\/?(?:\?|$)/i);
-                    if (prodSlugMatch) {
-                        slugTitle = decodeSlugToRussian(prodSlugMatch[1]);
-                        article = prodSlugMatch[2];
-                    } else {
-                        const ozonArt = rawInput.match(/-(\d{7,12})\/?(?:\?|$)/) || rawInput.match(/text=(\d{7,12})/) || rawInput.match(/\/product\/(\d{7,12})/);
+                    try {
+                        const u = new URL(rawInput);
+                        const segs = u.pathname.split('/').filter(Boolean);
+                        const prodSeg = segs.find(s => s.includes('-') && s !== 'product');
+                        if (prodSeg) {
+                            const m = prodSeg.match(/^(.*?)-(\d{6,12})$/);
+                            if (m) {
+                                slugTitle = decodeSlugToRussian(m[1]);
+                                article = m[2];
+                            } else {
+                                slugTitle = decodeSlugToRussian(prodSeg);
+                            }
+                        }
+                        if (!article && u.searchParams.get('text')) {
+                            article = u.searchParams.get('text');
+                        }
+                    } catch (e) {}
+                    if (!article) {
+                        const ozonArt = rawInput.match(/-(\d{7,12})\/?(?:\?|$)/) || rawInput.match(/\/product\/(\d{7,12})/);
                         if (ozonArt) article = ozonArt[1];
                     }
                     if (article) document.getElementById('add-article-input').value = article;
-                } else if (rawInput.includes('dns-shop.ru')) {
-                    store = 'dns';
-                    document.getElementById('add-store-input').value = 'dns';
-                    const dnsSlugMatch = rawInput.match(/\/product\/[a-z0-9]+\/([a-z0-9-]+)\/?/i);
-                    if (dnsSlugMatch) {
-                        slugTitle = decodeSlugToRussian(dnsSlugMatch[1]);
-                    }
-                    const dnsArt = rawInput.match(/[?&]q=(\d{5,10})/);
-                    if (dnsArt) {
-                        article = dnsArt[1];
-                        document.getElementById('add-article-input').value = article;
-                    }
                 }
 
-                // Сразу ставим умное русское название из текста или из ссылки, чтобы никогда не было "Just a moment" или пустого поля
-                const bestInitialTitle = prefixTextTitle || slugTitle;
-                if (bestInitialTitle) {
-                    document.getElementById('add-title-input').value = bestInitialTitle;
-                }
-
-                // 3. Пробуем получить метаданные через Microlink, но фильтруем антибот-заглушки Ozon
-                let foundGoodImage = false;
+                // 3. Попытка вытащить живой заголовок/фото через Microlink (если антибот пропустит)
+                let scrapedTitle = '';
+                let scrapedDesc = '';
+                let scrapedImg = '';
                 try {
                     const mlRes = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(rawInput)}`);
                     if (mlRes.ok) {
                         const mlData = await mlRes.json();
                         if (mlData.status === 'success' && mlData.data) {
-                            const scrapedTitle = mlData.data.title ? mlData.data.title.replace(/\s*[—\-|].*(купить|ozon|озон|dns|днс).*$/i, '').trim() : '';
-                            if (scrapedTitle && !isBadScrapedTitle(scrapedTitle)) {
-                                document.getElementById('add-title-input').value = scrapedTitle;
-                            }
-                            if (mlData.data.description && !isBadScrapedTitle(mlData.data.description)) {
-                                document.getElementById('add-desc-input').value = mlData.data.description.slice(0, 220);
-                            }
-                            const imgCandidate = mlData.data.image?.url;
-                            if (imgCandidate && !isBadScrapedImage(imgCandidate)) {
-                                document.getElementById('add-image-input').value = imgCandidate;
-                                foundGoodImage = true;
-                            }
+                            const candTitle = (mlData.data.title || '').replace(/\s*[—\-|].*(купить|ozon|озон|dns|днс|интернет-магазин).*$/i, '').trim();
+                            if (candTitle && !isBadScrapedTitle(candTitle)) scrapedTitle = candTitle;
+                            const candDesc = (mlData.data.description || '').trim();
+                            if (candDesc && !isBadScrapedTitle(candDesc) && candDesc.length > 20) scrapedDesc = candDesc.slice(0, 220);
+                            const candImg = mlData.data.image?.url || '';
+                            if (candImg && !isBadScrapedImage(candImg)) scrapedImg = candImg;
                         }
                     }
                 } catch (e) {}
 
-                // Финальная проверка названия и картинки для Ozon / DNS
-                const finalTitle = document.getElementById('add-title-input').value.trim() || bestInitialTitle || (article ? `Товар ${store.toUpperCase()} (${article})` : 'Желанный подарок');
+                const finalTitle = prefixTextTitle || scrapedTitle || slugTitle || (article ? `Подарок из ${store.toUpperCase()} (${article})` : 'Новогодний подарок');
                 document.getElementById('add-title-input').value = finalTitle;
 
-                if (!document.getElementById('add-desc-input').value.trim()) {
-                    document.getElementById('add-desc-input').value = store === 'ozon'
-                        ? `Желанная находка на Ozon${article ? ' (Арт. ' + article + ')' : ''}. Переходите по кнопке прямо в карточку товара! 🎁💙`
-                        : `Отличный подарок из списка желаний! 🎄✨`;
+                // 4. Подбираем умное тематическое описание, плашку и красивое фото по распознанному товару!
+                const profile = getSmartCategoryProfile(finalTitle, store, article);
+                document.getElementById('add-desc-input').value = scrapedDesc || profile.desc;
+                if (!document.getElementById('add-spec-input').value.trim()) {
+                    document.getElementById('add-spec-input').value = profile.tag;
                 }
+                document.getElementById('add-image-input').value = scrapedImg || profile.img;
 
-                // Если Ozon заблокировал картинку антиботом — создаём аккуратную брендированную обложку с названием и артикулом (вместо странной иконки)
-                if (!foundGoodImage && !document.getElementById('add-image-input').value.trim()) {
-                    document.getElementById('add-image-input').value = makeSmartStoreCoverSvg(store, finalTitle, article);
-                    statusEl.innerHTML = '✅ Название и артикул распознаны! <span class="text-slate-300">(Ozon скрывает фото от ботов — создана красивая обложка, либо вы можете вставить фото ниже/выбрать скриншот с телефона)</span>';
-                } else {
-                    statusEl.textContent = '✅ Ссылка успешно разобрана! Проверьте поля и укажите цену.';
-                }
+                statusEl.innerHTML = '✅ <b>Готово!</b> Название, тематическое фото и описание подобраны автоматически. Проверьте цену и нажимайте «Добавить подарок»!';
             } catch (e) {
-                statusEl.textContent = '⚠️ Ссылка обработана частично — проверьте название и цену.';
+                statusEl.textContent = '⚠️ Ссылка обработана — проверьте поля.';
             } finally {
                 btn.disabled = false;
             }
