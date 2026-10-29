@@ -82,4 +82,1284 @@
             <button onclick="closeEditModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                Настроить карточку
+            </h3>
+            <p class="text-xs text-slate-400 mb-5">Можно вставить прямую ссылку на картинку прямо с Ozon / WB / DNS, изменить цену или подправить описание.</p>
+            
+            <input type="hidden" id="edit-item-id">
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Название подарка</label>
+                    <input type="text" id="edit-title-input" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Цена подарка</label>
+                    <input type="text" id="edit-price-input" placeholder="Например: ~4 500 ₽" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Ссылка на картинку (URL)</label>
+                    <input type="url" id="edit-image-input" placeholder="https://..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
+                    <p class="text-[11px] text-slate-500 mt-1">Нажмите правой кнопкой мыши по фото товара в магазине → «Копировать адрес изображения»</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Описание и пожелания</label>
+                    <textarea id="edit-desc-input" rows="3" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-800">
+                <button onclick="resetItemCustomization()" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-2 transition-colors">
+                    Сбросить по умолчанию
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
+                        Отмена
+                    </button>
+                    <button onclick="saveItemCustomization()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold transition-colors shadow-lg shadow-amber-500/20">
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления новой карточки по ссылке -->
+    <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+            <button onclick="closeAddModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-emerald-400"></i>
+                Добавить новую карточку
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Вставьте ссылку на товар (WB, Ozon, DNS) или артикул WB и нажмите «Заполнить» — сайт сам подгрузит данные!</p>
+
+            <div class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ссылка на товар или артикул</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="add-url-input" placeholder="https://www.wildberries.ru/... или ссылка Ozon/DNS" class="flex-1 bg-slate-800/90 border border-slate-700 focus:border-emerald-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none transition-colors">
+                        <button onclick="autoFillFromUrl()" id="autofill-btn" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-bold transition-all shrink-0 flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Заполнить</span>
+                        </button>
+                    </div>
+                    <p id="autofill-status" class="text-[11px] text-amber-300 mt-1 hidden"></p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Магазин</label>
+                        <select id="add-store-input" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                            <option value="wb">Wildberries</option>
+                            <option value="ozon">Ozon</option>
+                            <option value="dns">DNS</option>
+                            <option value="special18">Особое 18+ / Офлайн</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Цена (₽)</label>
+                        <input type="text" id="add-price-input" placeholder="Например: ~3 490 ₽" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Артикул (если есть)</label>
+                        <input type="text" id="add-article-input" placeholder="Напр: 12345678" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Плашка / Особенность</label>
+                        <input type="text" id="add-spec-input" placeholder="Напр: Новая хотелка ✨" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Название подарка</label>
+                    <input type="text" id="add-title-input" placeholder="Название товара" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ссылка на картинку (URL)</label>
+                    <input type="url" id="add-image-input" placeholder="https://..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Описание</label>
+                    <textarea id="add-desc-input" rows="2" placeholder="Короткое описание или пожелание..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-slate-800">
+                <button onclick="closeAddModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
+                    Отмена
+                </button>
+                <button onclick="saveNewItem()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold transition-colors shadow-lg shadow-emerald-500/20">
+                    Добавить подарок
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Шапка сайта -->
+    <header class="max-w-5xl mx-auto px-4 pt-8 pb-6 text-center relative z-10">
+        <!-- Верхняя панель синхронизации и кнопка добавления подарка -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-6 bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-2xl backdrop-blur-md">
+            <div class="flex items-center gap-2 text-xs font-medium">
+                <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span id="sync-text" class="text-slate-300">Подключение к Google Таблице...</span>
+                <button onclick="syncWithSheet(true)" title="Обновить статусы броней" class="ml-1 text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+            <button onclick="openAddModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-plus"></i>
+                <span>Добавить подарок по ссылке</span>
+            </button>
+        </div>
+
+        <!-- Новогодний бейдж -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-red-500/20 via-amber-500/20 to-emerald-500/20 border border-amber-400/30 rounded-full mb-5 text-amber-300 text-xs sm:text-sm font-semibold shadow-lg">
+            <i class="fa-solid fa-sleigh text-red-400 animate-bounce"></i>
+            <span>Официальная шпаргалка для Тайного Санты и друзей</span>
+            <i class="fa-solid fa-tree text-emerald-400"></i>
+        </div>
+
+        <h1 class="serif-title text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-amber-200 via-white to-red-300 bg-clip-text text-transparent drop-shadow-sm">
+            Новогодний Вишлист Дениски 🎄
+        </h1>
+
+        <p class="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+            Друзья, чтобы вы не ломали голову, что мне подарить под ёлочку — я собрал здесь всё самое нужное: от чёткого зрения и крутых кроссовок до космического апгрейда ПК! Выбирайте, копируйте артикул в один клик и отмечайте бронь, чтобы подарки не повторились ✨
+        </p>
+
+        <!-- Панель фильтров и управления -->
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3 no-scrollbar">
+            <button onclick="filterWishlist('all')" data-filter="all" class="filter-btn active-filter px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 flex items-center gap-2">
+                <i class="fa-solid fa-gifts"></i> <span id="count-all">Все подарки (11)</span>
+            </button>
+            <button onclick="filterWishlist('wb')" data-filter="wb" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-purple-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-purple-400"></i> <span id="count-wb">Wildberries (3)</span>
+            </button>
+            <button onclick="filterWishlist('ozon')" data-filter="ozon" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-blue-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
+                <i class="fa-solid fa-box-open text-blue-400"></i> <span id="count-ozon">Ozon (3)</span>
+            </button>
+            <button onclick="filterWishlist('dns')" data-filter="dns" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-amber-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-amber-400"></i> <span id="count-dns">DNS (4)</span>
+            </button>
+            <button onclick="filterWishlist('special18')" data-filter="special18" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-rose-900/50 text-slate-300 border border-rose-500/40 flex items-center gap-2">
+                <i class="fa-solid fa-ban-smoking text-rose-400"></i> <span id="count-special18">Особое 18+ (1)</span>
+            </button>
+        </div>
+
+        <!-- Строка сортировки по ценам -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-400">
+            <span id="stats-counter" class="px-3 py-1 rounded-lg bg-slate-900/70 border border-slate-800">Всего: 11</span>
+            <div class="flex items-center gap-1.5 bg-slate-900/70 border border-slate-800 px-3 py-1 rounded-lg">
+                <i class="fa-solid fa-sort text-amber-400"></i>
+                <span>Сортировка по цене:</span>
+                <select id="sort-select" onchange="changeSort(this.value)" class="bg-transparent text-slate-200 font-semibold outline-none cursor-pointer">
+                    <option value="default" class="bg-slate-900">По умолчанию</option>
+                    <option value="price-asc" class="bg-slate-900">Сначала дешевле</option>
+                    <option value="price-desc" class="bg-slate-900">Сначала дороже</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Сетка подарков -->
+    <main class="max-w-5xl mx-auto px-4 mt-4 relative z-10">
+        <div id="wishlist-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Карточки рендерятся через JS для поддержки сохранения фото, описаний и бронирования -->
+        </div>
+    </main>
+
+    <!-- Подвал с подсказками -->
+    <footer class="max-w-4xl mx-auto px-4 mt-16 text-center relative z-10">
+        <div class="card-glass border border-slate-800/80 rounded-2xl p-5 max-w-xl mx-auto mb-6">
+            <p class="text-xs sm:text-sm text-slate-300 flex items-center justify-center gap-2 font-medium mb-1">
+                <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                <span>Подсказка для Дениски и гостей:</span>
+            </p>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Если нужно поменять картинку, цену или текст — нажмите на иконку <span class="text-slate-200 font-semibold"><i class="fa-solid fa-camera"></i> «Своё фото»</span> в углу любой карточки. Чтобы добавить новый товар по ссылке, нажмите <span class="text-emerald-400 font-semibold">«+ Добавить подарок по ссылке»</span> в самом верху страницы!
+            </p>
+        </div>
+        <p class="text-slate-500 text-xs">
+            Сделано с новогодним настроением специально для Дениски 🎄❄️ Мандаринов и счастья в новом году!
+        </p>
+    </footer>
+
+    <script>
+        // Список ваших URL Google Apps Script (проверяет новый, а если он не отвечает — переключается на первый)
+        const SCRIPT_URLS = [
+            'https://script.google.com/macros/s/AKfycbzpOUVNmz8FcWWB0bubCf0FOlGFU7xM8bm7hVx7w4EqNJz_9KEv9Zoe8wuyd6gKwm0vsQ/exec',
+            'https://script.google.com/macros/s/AKfycbzNBeRSRNM-bUEbKco1fVtHH97zxrNDJlstkY1ziVYnrgitTjviMyCs0Es-Fgv0P7k8Uw/exec'
+        ];
+        let activeScriptUrl = SCRIPT_URLS[0];
+
+        // Функция автоматического вычисления корзины Wildberries по артикулу (nmId),
+        // чтобы пытаться подгрузить оригинальное фото товара напрямую с серверов WB
+        function getWbBasketInfo(nmId) {
+            const id = parseInt(nmId, 10);
+            const vol = Math.floor(id / 100000);
+            const part = Math.floor(id / 1000);
+            let basket = '01';
+            if (vol >= 0 && vol <= 143) basket = '01';
+            else if (vol <= 287) basket = '02';
+            else if (vol <= 431) basket = '03';
+            else if (vol <= 719) basket = '04';
+            else if (vol <= 1007) basket = '05';
+            else if (vol <= 1061) basket = '06';
+            else if (vol <= 1115) basket = '07';
+            else if (vol <= 1169) basket = '08';
+            else if (vol <= 1313) basket = '09';
+            else if (vol <= 1601) basket = '10';
+            else if (vol <= 1655) basket = '11';
+            else if (vol <= 1919) basket = '12';
+            else if (vol <= 2045) basket = '13';
+            else if (vol <= 2189) basket = '14';
+            else if (vol <= 2405) basket = '15';
+            else if (vol <= 2621) basket = '16';
+            else if (vol <= 2837) basket = '17';
+            else basket = '18';
+            return { basket, vol, part, id };
+        }
+
+        function getWbImageUrls(nmId) {
+            const { basket, vol, part, id } = getWbBasketInfo(nmId);
+            return `https://basket-${basket}.wbbasket.ru/vol${vol}/part${part}/${id}/images/big/1.webp`;
+        }
+
+        // Создание реалистичных SVG-иллюстраций с фото-подложкой для специфичных товаров (например, упаковка линз ADRIA -0.75)
+        const lensSvgDataUri = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1e1b4b"/>
+                        <stop offset="50%" stop-color="#311042"/>
+                        <stop offset="100%" stop-color="#0f172a"/>
+                    </linearGradient>
+                    <linearGradient id="box" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#ec4899"/>
+                        <stop offset="100%" stop-color="#8b5cf6"/>
+                    </linearGradient>
+                    <linearGradient id="lens" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.85"/>
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.4"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bg)"/>
+                <circle cx="480" cy="90" r="110" fill="#a855f7" opacity="0.15"/>
+                <circle cx="110" cy="320" r="130" fill="#38bdf8" opacity="0.12"/>
+                <!-- Упаковка линз ADRIA Season -->
+                <rect x="90" y="85" width="240" height="175" rx="20" fill="url(#box)" stroke="#f472b6" stroke-width="2"/>
+                <rect x="108" y="103" width="85" height="28" rx="8" fill="#111827" opacity="0.85"/>
+                <text x="150" y="122" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="16" text-anchor="middle">ADRIA</text>
+                <text x="110" y="162" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="24">SEASON</text>
+                <text x="110" y="185" fill="#fce7f3" font-family="Arial, sans-serif" font-size="13">Квартальные линзы (2 шт.)</text>
+                <rect x="110" y="205" width="115" height="36" rx="10" fill="#ffffff"/>
+                <text x="167" y="229" fill="#be185d" font-family="Arial, sans-serif" font-weight="bold" font-size="19" text-anchor="middle">D: -0.75</text>
+                <!-- Блистеры и сама линза -->
+                <rect x="300" y="165" width="210" height="145" rx="24" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="3"/>
+                <circle cx="365" cy="238" r="44" fill="#0284c7" opacity="0.25"/>
+                <circle cx="365" cy="238" r="34" fill="url(#lens)" stroke="#38bdf8" stroke-width="2"/>
+                <ellipse cx="355" cy="225" rx="12" ry="6" fill="#ffffff" opacity="0.7" transform="rotate(-25 355 225)"/>
+                <circle cx="455" cy="238" r="44" fill="#0284c7" opacity="0.25"/>
+                <circle cx="455" cy="238" r="34" fill="url(#lens)" stroke="#38bdf8" stroke-width="2"/>
+                <ellipse cx="445" cy="225" rx="12" ry="6" fill="#ffffff" opacity="0.7" transform="rotate(-25 445 225)"/>
+            </svg>
+        `);
+
+        // Детальная SVG-иллюстрация для керамических мисок Finick на подставке
+        const bowlsSvgDataUri = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="bgBowls" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1e1b4b"/>
+                        <stop offset="50%" stop-color="#1f2937"/>
+                        <stop offset="100%" stop-color="#0f172a"/>
+                    </linearGradient>
+                    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#d97706"/>
+                        <stop offset="50%" stop-color="#f59e0b"/>
+                        <stop offset="100%" stop-color="#b45309"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bgBowls)"/>
+                <circle cx="480" cy="100" r="110" fill="#f59e0b" opacity="0.12"/>
+                <circle cx="120" cy="300" r="130" fill="#a855f7" opacity="0.12"/>
+                <!-- Деревянная/бамбуковая подставка -->
+                <rect x="85" y="240" width="430" height="28" rx="10" fill="url(#wood)" stroke="#fef3c7" stroke-width="2"/>
+                <path d="M110 268 L95 335 L120 335 L132 268 Z" fill="#b45309"/>
+                <path d="M490 268 L505 335 L480 335 L468 268 Z" fill="#b45309"/>
+                <!-- Левая керамическая миска -->
+                <path d="M125 175 C125 250, 275 250, 275 175 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="4"/>
+                <ellipse cx="200" cy="175" rx="75" ry="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
+                <ellipse cx="200" cy="179" rx="60" ry="12" fill="#d97706" opacity="0.8"/>
+                <!-- Правая керамическая миска -->
+                <path d="M325 175 C325 250, 475 250, 475 175 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="4"/>
+                <ellipse cx="400" cy="175" rx="75" ry="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
+                <ellipse cx="400" cy="179" rx="62" ry="13" fill="#38bdf8" opacity="0.65"/>
+                <!-- Бренд Finick и лапка -->
+                <rect x="235" y="65" width="130" height="36" rx="12" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="300" y="89" fill="#fef3c7" font-family="Arial, sans-serif" font-weight="bold" font-size="18" text-anchor="middle">FINICK 🐾</text>
+            </svg>
+        `);
+
+        // Детальная SVG-иллюстрация для фиолетового геймпада 8BitDo PRO 3
+        const gamepadSvgDataUri = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="bgPad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#1e1b4b"/>
+                        <stop offset="50%" stop-color="#2e1065"/>
+                        <stop offset="100%" stop-color="#090d16"/>
+                    </linearGradient>
+                    <linearGradient id="padBody" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#8b5cf6"/>
+                        <stop offset="50%" stop-color="#6d28d9"/>
+                        <stop offset="100%" stop-color="#4c1d95"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bgPad)"/>
+                <circle cx="300" cy="200" r="160" fill="#a855f7" opacity="0.15"/>
+                <!-- Корпус 8BitDo Pro -->
+                <path d="M175 120 L425 120 C475 120, 505 170, 490 250 C480 305, 445 330, 415 315 C385 300, 375 250, 350 245 L250 245 C225 250, 215 300, 185 315 C155 330, 120 305, 110 250 C95 170, 125 120, 175 120 Z" fill="url(#padBody)" stroke="#c4b5fd" stroke-width="3"/>
+                <!-- Крестовина D-Pad -->
+                <rect x="175" y="152" width="22" height="64" rx="4" fill="#1f2937"/>
+                <rect x="154" y="173" width="64" height="22" rx="4" fill="#1f2937"/>
+                <!-- Симметричные стики в стиле 8BitDo Pro -->
+                <circle cx="248" cy="220" r="28" fill="#312e81" stroke="#a78bfa" stroke-width="2"/>
+                <circle cx="248" cy="220" r="20" fill="#111827"/>
+                <circle cx="352" cy="220" r="28" fill="#312e81" stroke="#a78bfa" stroke-width="2"/>
+                <circle cx="352" cy="220" r="20" fill="#111827"/>
+                <!-- Кнопки X Y A B -->
+                <circle cx="415" cy="155" r="11" fill="#1f2937" stroke="#ddd6fe" stroke-width="1.5"/>
+                <circle cx="415" cy="205" r="11" fill="#1f2937" stroke="#ddd6fe" stroke-width="1.5"/>
+                <circle cx="390" cy="180" r="11" fill="#1f2937" stroke="#ddd6fe" stroke-width="1.5"/>
+                <circle cx="440" cy="180" r="11" fill="#1f2937" stroke="#ddd6fe" stroke-width="1.5"/>
+                <!-- Логотип -->
+                <text x="300" y="155" fill="#ede9fe" font-family="Arial, sans-serif" font-weight="bold" font-size="15" text-anchor="middle">8BitDo PRO 3</text>
+            </svg>
+        `);
+
+        // Детальная SVG-иллюстрация для блока Marlboro Aroma Fresh (18+)
+        const marlboroSvgDataUri = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="bgMarl" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#090d16"/>
+                        <stop offset="50%" stop-color="#132a2e"/>
+                        <stop offset="100%" stop-color="#1e1b4b"/>
+                    </linearGradient>
+                    <linearGradient id="carton" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#0f172a"/>
+                        <stop offset="60%" stop-color="#1e293b"/>
+                        <stop offset="100%" stop-color="#0f172a"/>
+                    </linearGradient>
+                    <linearGradient id="freshAccent" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#10b981"/>
+                        <stop offset="50%" stop-color="#06b6d4"/>
+                        <stop offset="100%" stop-color="#3b82f6"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bgMarl)"/>
+                <circle cx="140" cy="110" r="120" fill="#10b981" opacity="0.14"/>
+                <circle cx="470" cy="300" r="140" fill="#ef4444" opacity="0.12"/>
+                <!-- Коробка-блок (10 пачек) -->
+                <rect x="75" y="115" width="450" height="190" rx="18" fill="url(#carton)" stroke="#334155" stroke-width="3"/>
+                <!-- Фирменный шеврон/крыша -->
+                <path d="M75 175 L215 115 L385 115 L525 175 L525 133 C525 123, 517 115, 507 115 L93 115 C83 115, 75 123, 75 133 Z" fill="url(#freshAccent)" opacity="0.9"/>
+                <polygon points="300,128 245,175 355,175" fill="#0f172a"/>
+                <!-- Текст блока -->
+                <text x="300" y="215" fill="#ffffff" font-family="Georgia, serif" font-weight="bold" font-size="34" text-anchor="middle" letter-spacing="1">Marlboro</text>
+                <rect x="195" y="232" width="210" height="32" rx="16" fill="url(#freshAccent)"/>
+                <text x="300" y="253" fill="#022c22" font-family="Arial, sans-serif" font-weight="bold" font-size="16" text-anchor="middle" letter-spacing="1.5">AROMA FRESH</text>
+                <text x="300" y="287" fill="#94a3b8" font-family="Arial, sans-serif" font-size="13" text-anchor="middle">БЛОК • 10 ПАЧЕК • КАПСУЛА СВЕЖЕСТИ</text>
+                <!-- Крупный знак 18+ -->
+                <circle cx="490" cy="95" r="38" fill="#dc2626" stroke="#fca5a5" stroke-width="3"/>
+                <text x="490" y="105" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" font-size="26" text-anchor="middle">18+</text>
+            </svg>
+        `);
+
+        // База всех 11 подарков Дениски с точными данными, ценами, живыми описаниями и реальными/максимально близкими фото
+        const defaultWishlistItems = [
+            {
+                id: 'wb-11169687',
+                store: 'wb',
+                storeName: 'Wildberries',
+                article: '11169687',
+                price: '~950 ₽',
+                badgeColor: 'bg-purple-600/90 text-white border-purple-400/40',
+                btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30',
+                borderColor: 'hover:border-purple-500/60',
+                icon: 'fa-eye',
+                specTag: 'Диоптрии: -0.75',
+                specColor: 'bg-pink-500/20 text-pink-300 border-pink-500/40',
+                title: 'Контактные линзы ADRIA Season (-0.75)',
+                description: 'Чтобы в новом году видеть мир (и новые игры в 4K) в максимальной чёткости и без пикселей! Важно: оптическая сила ровно -0.75 👀',
+                primaryImage: getWbImageUrls('11169687'),
+                fallbackImage: lensSvgDataUri,
+                url: 'https://www.wildberries.ru/catalog/11169687/detail.aspx'
+            },
+            {
+                id: 'wb-1462477640',
+                store: 'wb',
+                storeName: 'Wildberries',
+                article: '1462477640',
+                price: '~4 800 ₽',
+                badgeColor: 'bg-purple-600/90 text-white border-purple-400/40',
+                btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30',
+                borderColor: 'hover:border-purple-500/60',
+                icon: 'fa-shoe-prints',
+                specTag: 'Размер: 43–44',
+                specColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+                title: 'Кроссовки мужские ASICS GEL-PICKAX',
+                description: 'Стильные, неубиваемые и суперудобные кроссовки с мощной амортизацией и цепким протектором для любых приключений. Главное — размер 43–44! 👟🔥',
+                primaryImage: getWbImageUrls('1462477640'),
+                fallbackImage: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.wildberries.ru/catalog/1462477640/detail.aspx'
+            },
+            {
+                id: 'wb-781974428',
+                store: 'wb',
+                storeName: 'Wildberries',
+                article: '781974428',
+                price: '~1 350 ₽',
+                badgeColor: 'bg-purple-600/90 text-white border-purple-400/40',
+                btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30',
+                borderColor: 'hover:border-purple-500/60',
+                icon: 'fa-paw',
+                specTag: 'Пушистому боссу 🐾',
+                specColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+                title: 'Керамические миски Finick на подставке',
+                description: 'Стильные керамические миски для главного пушистого хозяина квартиры. Чтобы новогодний праздничный ужин у котика тоже проходил на высшем ресторанном уровне! 🐱🍽️',
+                primaryImage: getWbImageUrls('781974428'),
+                fallbackImage: bowlsSvgDataUri,
+                url: 'https://www.wildberries.ru/catalog/781974428/detail.aspx'
+            },
+            {
+                id: 'dns-5661752',
+                store: 'dns',
+                storeName: 'DNS',
+                article: '5661752',
+                price: '~349 990 ₽',
+                badgeColor: 'bg-amber-500/90 text-slate-950 border-amber-300/50',
+                btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/30',
+                borderColor: 'hover:border-amber-500/60',
+                icon: 'fa-microchip',
+                specTag: 'Ультра-Графон 🚀',
+                specColor: 'bg-red-500/20 text-red-300 border-red-500/40',
+                title: 'Видеокарта ASUS GeForce RTX 5090 ROG Matrix Platinum (32 ГБ)',
+                description: 'Абсолютный монстр производительности. Если вдруг кто-то решил стать настоящим новогодним Дедом Морозом — эта карточка запустит вообще всё на годы вперёд! 🚀🎮',
+                primaryImage: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.dns-shop.ru/search/?q=5661752'
+            },
+            {
+                id: 'dns-9336192',
+                store: 'dns',
+                storeName: 'DNS',
+                article: '9336192',
+                price: '~54 990 ₽',
+                badgeColor: 'bg-amber-500/90 text-slate-950 border-amber-300/50',
+                btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/30',
+                borderColor: 'hover:border-amber-500/60',
+                icon: 'fa-chair',
+                specTag: 'Королевский трон 👑',
+                specColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                title: 'Кресло кожаное FALTO Leather Premium SL (белое)',
+                description: 'Эргономичное кресло из натуральной кожи с поддержкой спины и шеи. Идеальный трон для долгих каток, работы и просмотра видосов с максимальным комфортом. 💺✨',
+                primaryImage: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.dns-shop.ru/search/?q=9336192'
+            },
+            {
+                id: 'dns-5636476',
+                store: 'dns',
+                storeName: 'DNS',
+                article: '5636476',
+                price: '~5 499 ₽',
+                badgeColor: 'bg-amber-500/90 text-slate-950 border-amber-300/50',
+                btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/30',
+                borderColor: 'hover:border-amber-500/60',
+                icon: 'fa-gamepad',
+                specTag: 'Гейминг 🎮',
+                specColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+                title: 'Геймпад беспроводной/проводной 8BitDo PRO 3 (фиолетовый)',
+                description: 'Крутейший фиолетовый контроллер в ретро-стиле с современной начинкой. Идеально лежит в руках — то что нужно для уютных новогодних вечеров в любимых играх! 🎮💜',
+                primaryImage: gamepadSvgDataUri,
+                fallbackImage: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.dns-shop.ru/product/3ae751e770f5d582/gejmpad-besprovodnojprovodnoj-8bitdo-pro-3-fioletovyj/'
+            },
+            {
+                id: 'dns-9287038',
+                store: 'dns',
+                storeName: 'DNS',
+                article: '9287038',
+                price: '~22 999 ₽',
+                badgeColor: 'bg-amber-500/90 text-slate-950 border-amber-300/50',
+                btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/30',
+                borderColor: 'hover:border-amber-500/60',
+                icon: 'fa-desktop',
+                specTag: '27" QHD Монитор 🖥️',
+                specColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+                title: '27" Монитор Samsung Odyssey G5 G50SF (S27FG502SI)',
+                description: 'Сочная картинка, плавная герцовка и глубокий контраст. Чтобы каждый кадр в играх и кино радовал глаз на все сто процентов! 🖥️✨',
+                primaryImage: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1547119957-637f8679db1e?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.dns-shop.ru/product/characteristics/7f9635bd9d8b8450/27-monitor-samsung-odyssey-g5-g50sf-s27fg502si-cernyj/'
+            },
+            {
+                id: 'ozon-2898958593',
+                store: 'ozon',
+                storeName: 'Ozon',
+                article: '2898958593',
+                price: '~34 900 ₽',
+                badgeColor: 'bg-blue-600/90 text-white border-blue-400/40',
+                btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30',
+                borderColor: 'hover:border-blue-500/60',
+                icon: 'fa-vr-cardboard',
+                specTag: 'Виртуальная реальность 🥽',
+                specColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
+                title: 'VR-шлем Meta / Oculus Quest 3S (128 ГБ)',
+                description: 'Билет в другие миры прямо из комнаты! Автономный VR-шлем на базе Snapdragon XR2 Gen 2 на 128 ГБ для полного погружения в игры и виртуальную реальность. 🥽🌌',
+                primaryImage: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.ozon.ru/product/vr-shlem-oculus-quest-3s-8-gb-128-gb-snapdragon-xr2-gen-2-4324-mach-globalnaya-versiya-2898958593/'
+            },
+            {
+                id: 'ozon-5877194478',
+                store: 'ozon',
+                storeName: 'Ozon',
+                article: '5877194478',
+                price: '~2 500 ₽',
+                badgeColor: 'bg-blue-600/90 text-white border-blue-400/40',
+                btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30',
+                borderColor: 'hover:border-blue-500/60',
+                icon: 'fa-box-open',
+                specTag: 'Ozon Хотелка 🎁',
+                specColor: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+                title: 'Подарок с Ozon #1 (Арт. 5877194478)',
+                description: 'Полезная и очень желанная находка на Ozon. Переходите по кнопке прямо в карточку товара или скопируйте артикул в один клик! 🎁💙',
+                primaryImage: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.ozon.ru/search/?text=5877194478'
+            },
+            {
+                id: 'ozon-4312381261',
+                store: 'ozon',
+                storeName: 'Ozon',
+                article: '4312381261',
+                price: '~1 900 ₽',
+                badgeColor: 'bg-blue-600/90 text-white border-blue-400/40',
+                btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30',
+                borderColor: 'hover:border-blue-500/60',
+                icon: 'fa-gift',
+                specTag: 'Ozon Сюрприз ✨',
+                specColor: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+                title: 'Подарок с Ozon #2 (Арт. 4312381261)',
+                description: 'Ещё один отличный вариант подарка под ёлку из списка желаний на Ozon. Точно пригодится и поднимет новогоднее настроение! 🔥🎄',
+                primaryImage: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=85',
+                fallbackImage: 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=800&q=85',
+                url: 'https://www.ozon.ru/search/?text=4312381261'
+            },
+            {
+                id: 'special-marlboro-18',
+                store: 'special18',
+                storeName: 'Офлайн / Табачная лавка',
+                article: null,
+                price: '~2 600 ₽',
+                is18Plus: true,
+                badgeColor: 'bg-rose-600/95 text-white border-rose-400/60',
+                btnColor: 'bg-slate-800/90 text-rose-300 border border-rose-500/40',
+                borderColor: 'hover:border-rose-500/70',
+                icon: 'fa-fire-flame-curved',
+                specTag: 'Строго 18+ 🔞',
+                specColor: 'bg-rose-600/30 text-rose-200 border-rose-500/60',
+                title: 'Блок Marlboro Aroma Fresh',
+                description: 'Целый блок ароматного запаса на новогодние праздники. Продаётся только в офлайн-магазинах, поэтому без ссылки — но найти легко в любом хорошем табачном отделе! (Минздрав предупреждает, а Дениска ждёт 😌)',
+                primaryImage: marlboroSvgDataUri,
+                fallbackImage: marlboroSvgDataUri,
+                url: null
+            }
+        ];
+
+        let currentFilter = 'all';
+        let currentSort = 'default';
+
+        // Загрузка пользовательских правок (картинки, цены, текст, статус брони, новые карточки) из localStorage
+        function getCustomizations() {
+            try {
+                return JSON.parse(localStorage.getItem('deniska_wishlist_custom_v2') || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveCustomizations(data) {
+            try {
+                localStorage.setItem('deniska_wishlist_custom_v2', JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function getReservedState() {
+            try {
+                return JSON.parse(localStorage.getItem('deniska_wishlist_reserved_v2') || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveReservedState(data) {
+            try {
+                localStorage.setItem('deniska_wishlist_reserved_v2', JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function getAddedItems() {
+            try {
+                const arr = JSON.parse(localStorage.getItem('deniska_added_items_v2') || '[]');
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveAddedItems(arr) {
+            try {
+                localStorage.setItem('deniska_added_items_v2', JSON.stringify(arr));
+            } catch (e) {}
+        }
+
+        // Объединяем базовые 11 подарков и новые добавленные карточки
+        function getAllWishlistItems() {
+            const added = getAddedItems();
+            const map = new Map();
+            defaultWishlistItems.forEach(item => map.set(item.id, item));
+            added.forEach(item => {
+                if (item && item.id) map.set(item.id, item);
+            });
+            return Array.from(map.values());
+        }
+
+        // Безопасная синхронизация с Google Таблицей (пробует рабочий URL и никогда не роняет сайт)
+        async function syncWithSheet(manual = false) {
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('sync-text');
+
+            for (const url of SCRIPT_URLS) {
+                try {
+                    const res = await fetch(url + '?t=' + Date.now());
+                    if (!res.ok) continue;
+                    const data = await res.json();
+                    if (!data || typeof data !== 'object') continue;
+
+                    activeScriptUrl = url;
+                    const reserved = getReservedState();
+
+                    // Поддержка и расширенного, и простого формата ответа от Google Таблицы
+                    if (data.bookings && typeof data.bookings === 'object') {
+                        Object.keys(data.bookings).forEach(k => {
+                            reserved[k] = data.bookings[k] === 'booked';
+                        });
+                        if (Array.isArray(data.customItems) && data.customItems.length > 0) {
+                            saveAddedItems(data.customItems);
+                        }
+                        if (data.overrides && typeof data.overrides === 'object') {
+                            const localCustom = getCustomizations();
+                            saveCustomizations({ ...localCustom, ...data.overrides });
+                        }
+                    } else {
+                        Object.keys(data).forEach(k => {
+                            if (k.startsWith('ITEM_') || k.startsWith('EDIT_')) return;
+                            reserved[k] = data[k] === 'booked';
+                        });
+                    }
+
+                    saveReservedState(reserved);
+                    if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+                    if (text) text.textContent = 'Синхронизировано с Google Таблицей';
+                    renderWishlist();
+                    if (manual) showToast('Статусы броней обновлены из таблицы!', 'fa-rotate');
+                    return;
+                } catch (e) {
+                    // Пробуем следующий URL
+                }
+            }
+
+            if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+            if (text) text.textContent = 'Локальный режим (таблица обновится при подключении)';
+            renderWishlist();
+        }
+
+        async function toggleReserve(itemId) {
+            const reserved = getReservedState();
+            const nextState = !reserved[itemId];
+            reserved[itemId] = nextState;
+            saveReservedState(reserved);
+            renderWishlist();
+
+            if (nextState) {
+                showToast('Подарок отмечен как «Забронирован»! 🎅', 'fa-lock');
+            } else {
+                showToast('Бронь снята — подарок снова свободен ✨', 'fa-lock-open');
+            }
+
+            // Отправляем статус в Google Таблицу в фоне
+            try {
+                await fetch(activeScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ id: itemId, status: nextState ? 'booked' : '' })
+                });
+            } catch (e) {}
+        }
+
+        // Копирование артикула в буфер обмена
+        function copyArticle(article, storeName) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = article;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(`Артикул ${article} (${storeName}) скопирован!`, 'fa-copy');
+        }
+
+        // Показ всплывающего уведомления
+        let toastTimeout;
+        function showToast(message, iconClass = 'fa-check') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            toastIcon.className = `fa-solid ${iconClass}`;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+
+        function parsePriceNumber(priceStr) {
+            if (!priceStr) return 0;
+            const digits = String(priceStr).replace(/[^\d]/g, '');
+            return digits ? parseInt(digits, 10) : 0;
+        }
+
+        function changeSort(val) {
+            currentSort = val;
+            renderWishlist();
+        }
+
+        // Отрисовка карточек вишлиста
+        function renderWishlist() {
+            const grid = document.getElementById('wishlist-grid');
+            const custom = getCustomizations();
+            const reserved = getReservedState();
+            const allItems = getAllWishlistItems();
+
+            // Обновляем счётчики на кнопках фильтров
+            const countByStore = (st) => allItems.filter(i => i.store === st).length;
+            const elAll = document.getElementById('count-all');
+            const elWb = document.getElementById('count-wb');
+            const elOzon = document.getElementById('count-ozon');
+            const elDns = document.getElementById('count-dns');
+            const elSpec = document.getElementById('count-special18');
+            if (elAll) elAll.textContent = `Все подарки (${allItems.length})`;
+            if (elWb) elWb.textContent = `Wildberries (${countByStore('wb')})`;
+            if (elOzon) elOzon.textContent = `Ozon (${countByStore('ozon')})`;
+            if (elDns) elDns.textContent = `DNS (${countByStore('dns')})`;
+            if (elSpec) elSpec.textContent = `Особое 18+ (${countByStore('special18')})`;
+
+            const bookedCount = allItems.filter(i => !!reserved[i.id]).length;
+            const freeCount = allItems.length - bookedCount;
+            const statsEl = document.getElementById('stats-counter');
+            if (statsEl) {
+                statsEl.innerHTML = `Всего подарков: <b class="text-white">${allItems.length}</b> • Свободно: <b class="text-emerald-400">${freeCount}</b> • Занято: <b class="text-amber-400">${bookedCount}</b>`;
+            }
+
+            let filteredItems = allItems.filter(item => {
+                if (currentFilter === 'all') return true;
+                return item.store === currentFilter;
+            });
+
+            if (currentSort === 'price-asc') {
+                filteredItems.sort((a, b) => {
+                    const pa = parsePriceNumber((custom[a.id] && custom[a.id].price) || a.price);
+                    const pb = parsePriceNumber((custom[b.id] && custom[b.id].price) || b.price);
+                    return pa - pb;
+                });
+            } else if (currentSort === 'price-desc') {
+                filteredItems.sort((a, b) => {
+                    const pa = parsePriceNumber((custom[a.id] && custom[a.id].price) || a.price);
+                    const pb = parsePriceNumber((custom[b.id] && custom[b.id].price) || b.price);
+                    return pb - pa;
+                });
+            }
+
+            grid.innerHTML = filteredItems.map(item => {
+                const itemCustom = custom[item.id] || {};
+                const title = itemCustom.title || item.title || 'Подарок';
+                const price = itemCustom.price || item.price || 'Цена по ссылке';
+                const description = itemCustom.description || item.description || '';
+                const imgUrl = itemCustom.image || item.primaryImage;
+                const isReserved = !!reserved[item.id];
+
+                return `
+                <article class="card-glass border ${isReserved ? 'border-emerald-500/40 opacity-85' : 'border-slate-700/70 ' + item.borderColor} rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 flex flex-col justify-between group relative">
+                    
+                    <div>
+                        <!-- Блок с фотографией товара -->
+                        <div class="relative h-56 w-full bg-slate-900 overflow-hidden">
+                            <img src="${imgUrl}" 
+                                 alt="${String(title).replace(/"/g, '&quot;')}" 
+                                 onerror="if (this.src !== '${item.fallbackImage}') { this.src = '${item.fallbackImage}'; }"
+                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ${isReserved ? 'grayscale-[40%]' : ''}">
+                            
+                            <!-- Градиент поверх фото -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#111827] via-slate-950/20 to-transparent"></div>
+
+                            <!-- Бейдж магазина -->
+                            <span class="absolute top-3.5 left-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-lg ${item.badgeColor}">
+                                <i class="fa-solid ${item.icon}"></i> ${item.storeName}
+                            </span>
+
+                            <!-- Бейдж цены -->
+                            <span class="absolute top-12 left-3.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-500/95 text-slate-950 border border-emerald-300 shadow-lg">
+                                <i class="fa-solid fa-tag text-[10px]"></i> ${price}
+                            </span>
+
+                            ${item.is18Plus ? `
+                            <!-- Дополнительная заметная метка 18+ -->
+                            <span class="absolute top-20 left-3.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-red-600 text-white border border-red-300 shadow-lg tracking-wider uppercase">
+                                🔞 18+
+                            </span>
+                            ` : ''}
+
+                            <!-- Кнопка быстрой смены фото, цены и текста + удаление для новых карточек -->
+                            <div class="absolute top-3.5 right-3.5 flex items-center gap-1.5">
+                                <button onclick="openEditModal('${item.id}')" 
+                                        title="Вставить свою картинку, цену или изменить описание"
+                                        class="px-2.5 py-1 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-200 hover:text-amber-300 border border-slate-600/60 backdrop-blur-md text-[11px] font-medium flex items-center gap-1.5 transition-all shadow-md">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <span>Своё фото</span>
+                                </button>
+                                ${item.isCustomAdded ? `
+                                <button onclick="deleteAddedItem('${item.id}')" 
+                                        title="Удалить эту карточку"
+                                        class="w-7 h-7 rounded-full bg-rose-950/85 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 flex items-center justify-center text-xs transition-all shadow-md">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+
+                            <!-- Бейдж характеристики (размер / диоптрии / объем) -->
+                            <div class="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border backdrop-blur-md ${item.specColor}">
+                                    <i class="fa-solid fa-star text-[10px]"></i> ${item.specTag}
+                                </span>
+
+                                ${item.article ? `
+                                <!-- Кнопка копирования артикула -->
+                                <button onclick="copyArticle('${item.article}', '${item.storeName}')" 
+                                        title="Нажмите, чтобы скопировать артикул"
+                                        class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-xs font-mono flex items-center gap-1.5 transition-colors shadow">
+                                    <span>Арт: ${item.article}</span>
+                                    <i class="fa-regular fa-copy text-[11px] text-amber-400"></i>
+                                </button>
+                                ` : `
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-950/90 text-rose-200 border border-rose-500/40 text-xs font-semibold flex items-center gap-1.5 shadow">
+                                    <i class="fa-solid fa-store text-[11px] text-rose-400"></i>
+                                    <span>Офлайн 18+</span>
+                                </span>
+                                `}
+                            </div>
+                        </div>
+
+                        <!-- Текстовое описание подарка -->
+                        <div class="p-5 pb-3">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h3 class="text-lg font-bold text-white leading-snug group-hover:text-amber-200 transition-colors">
+                                    ${title}
+                                </h3>
+                                <span class="shrink-0 px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">${price}</span>
+                            </div>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                ${description}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Нижняя панель действий -->
+                    <div class="px-5 pb-5 pt-3 mt-2 flex items-center justify-between gap-2 border-t border-slate-800/80">
+                        <!-- Кнопка бронирования подарка друзьями -->
+                        <button onclick="toggleReserve('${item.id}')" 
+                                class="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all border ${
+                                    isReserved 
+                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' 
+                                    : 'bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700/80 hover:text-white'
+                                }">
+                            <i class="fa-solid ${isReserved ? 'fa-check-double text-emerald-400' : 'fa-hand-holding-heart text-rose-400'}"></i>
+                            <span>${isReserved ? 'Кем-то занято!' : 'Я подарю!'}</span>
+                        </button>
+
+                        ${item.url ? `
+                        <!-- Ссылка на магазин -->
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-2 px-4 py-2 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-lg ${item.btnColor}">
+                            <span>В магазин</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </a>
+                        ` : `
+                        <!-- Плашка для офлайн-подарка 18+ без ссылки -->
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl select-none ${item.btnColor}">
+                            <span>🔞 Офлайн-магазин (18+)</span>
+                        </span>
+                        `}
+                    </div>
+                </article>
+                `;
+            }).join('');
+        }
+
+        // Фильтрация по магазинам
+        function filterWishlist(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.className = 'filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 flex items-center gap-2';
+                } else {
+                    btn.className = 'filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/70 flex items-center gap-2';
+                }
+            });
+            renderWishlist();
+        }
+
+        // Открытие модального окна для замены фото, цены или описания
+        function openEditModal(itemId) {
+            const item = getAllWishlistItems().find(i => i.id === itemId);
+            if (!item) return;
+
+            const custom = getCustomizations()[itemId] || {};
+            document.getElementById('edit-item-id').value = itemId;
+            document.getElementById('edit-title-input').value = custom.title || item.title || '';
+            document.getElementById('edit-price-input').value = custom.price || item.price || '';
+            document.getElementById('edit-image-input').value = custom.image || '';
+            document.getElementById('edit-desc-input').value = custom.description || item.description || '';
+
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('edit-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function saveItemCustomization() {
+            const itemId = document.getElementById('edit-item-id').value;
+            const title = document.getElementById('edit-title-input').value.trim();
+            const price = document.getElementById('edit-price-input').value.trim();
+            const image = document.getElementById('edit-image-input').value.trim();
+            const description = document.getElementById('edit-desc-input').value.trim();
+
+            const custom = getCustomizations();
+            const overrideObj = {
+                title: title || undefined,
+                price: price || undefined,
+                image: image || undefined,
+                description: description || undefined
+            };
+            custom[itemId] = overrideObj;
+
+            saveCustomizations(custom);
+            closeEditModal();
+            renderWishlist();
+            showToast('Карточка подарка обновлена! ✨', 'fa-wand-magic-sparkles');
+
+            try {
+                await fetch(activeScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'edit_item', id: itemId, override: overrideObj })
+                });
+            } catch (e) {}
+        }
+
+        function resetItemCustomization() {
+            const itemId = document.getElementById('edit-item-id').value;
+            const custom = getCustomizations();
+            delete custom[itemId];
+            saveCustomizations(custom);
+            closeEditModal();
+            renderWishlist();
+            showToast('Возвращены стандартные настройки карточки', 'fa-rotate-left');
+        }
+
+        // Функции модального окна добавления новой карточки по ссылке
+        function openAddModal() {
+            document.getElementById('add-url-input').value = '';
+            document.getElementById('add-title-input').value = '';
+            document.getElementById('add-price-input').value = '';
+            document.getElementById('add-article-input').value = '';
+            document.getElementById('add-spec-input').value = '';
+            document.getElementById('add-image-input').value = '';
+            document.getElementById('add-desc-input').value = '';
+            document.getElementById('autofill-status').classList.add('hidden');
+            const modal = document.getElementById('add-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('add-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function autoFillFromUrl() {
+            const rawInput = document.getElementById('add-url-input').value.trim();
+            const statusEl = document.getElementById('autofill-status');
+            const btn = document.getElementById('autofill-btn');
+
+            if (!rawInput) {
+                showToast('Вставьте ссылку или артикул!', 'fa-circle-exclamation');
+                return;
+            }
+
+            statusEl.classList.remove('hidden');
+            statusEl.textContent = '⏳ Загружаем данные о товаре...';
+            btn.disabled = true;
+
+            try {
+                // 1. Если это Wildberries (ссылка или артикул)
+                const wbMatch = rawInput.match(/catalog\/(\d+)/) || rawInput.match(/^(\d{6,12})$/);
+                if (wbMatch || rawInput.includes('wildberries.ru')) {
+                    const nmId = wbMatch ? wbMatch[1] : rawInput.replace(/[^\d]/g, '');
+                    document.getElementById('add-store-input').value = 'wb';
+                    document.getElementById('add-article-input').value = nmId;
+                    document.getElementById('add-image-input').value = getWbImageUrls(nmId);
+                    if (!rawInput.startsWith('http')) {
+                        document.getElementById('add-url-input').value = `https://www.wildberries.ru/catalog/${nmId}/detail.aspx`;
+                    }
+
+                    const { basket, vol, part, id } = getWbBasketInfo(nmId);
+                    try {
+                        const cardRes = await fetch(`https://basket-${basket}.wbbasket.ru/vol${vol}/part${part}/${id}/info/ru/card.json`);
+                        if (cardRes.ok) {
+                            const cardJson = await cardRes.json();
+                            const brand = cardJson.selling?.brand_name ? cardJson.selling.brand_name + ' / ' : '';
+                            document.getElementById('add-title-input').value = brand + (cardJson.imt_name || `Товар WB #${nmId}`);
+                            document.getElementById('add-desc-input').value = (cardJson.description || 'Желанный подарок с Wildberries под ёлочку!').slice(0, 220);
+                        }
+                    } catch (e) {}
+
+                    try {
+                        const priceRes = await fetch(`https://card.wb.ru/cards/v2/detail?appType=1&curr=rub&dest=-1257786&nm=${nmId}`);
+                        if (priceRes.ok) {
+                            const priceJson = await priceRes.json();
+                            const prod = priceJson?.data?.products?.[0];
+                            if (prod) {
+                                const priceRub = Math.round((prod.sizes?.[0]?.price?.product || prod.salePriceU || 0) / 100);
+                                if (priceRub > 0) {
+                                    document.getElementById('add-price-input').value = `~${priceRub.toLocaleString('ru-RU')} ₽`;
+                                }
+                                if (!document.getElementById('add-title-input').value && prod.name) {
+                                    document.getElementById('add-title-input').value = (prod.brand ? prod.brand + ' ' : '') + prod.name;
+                                }
+                            }
+                        }
+                    } catch (e) {}
+
+                    statusEl.textContent = '✅ Данные Wildberries успешно загружены!';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // 2. Определяем Ozon / DNS по ссылке
+                if (rawInput.includes('ozon.ru')) {
+                    document.getElementById('add-store-input').value = 'ozon';
+                    const ozonArt = rawInput.match(/-(\d{7,12})\/?(?:\?|$)/) || rawInput.match(/text=(\d{7,12})/);
+                    if (ozonArt) document.getElementById('add-article-input').value = ozonArt[1];
+                } else if (rawInput.includes('dns-shop.ru')) {
+                    document.getElementById('add-store-input').value = 'dns';
+                }
+
+                // 3. Пытаемся вытянуть название, описание и картинку через Microlink
+                const mlRes = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(rawInput)}`);
+                if (mlRes.ok) {
+                    const mlData = await mlRes.json();
+                    if (mlData.status === 'success' && mlData.data) {
+                        if (mlData.data.title && !mlData.data.title.includes('Just a moment') && !mlData.data.title.includes('Antibot')) {
+                            document.getElementById('add-title-input').value = mlData.data.title.replace(/ — купить.*$/i, '');
+                        }
+                        if (mlData.data.description) {
+                            document.getElementById('add-desc-input').value = mlData.data.description.slice(0, 220);
+                        }
+                        if (mlData.data.image?.url) {
+                            document.getElementById('add-image-input').value = mlData.data.image.url;
+                        }
+                    }
+                }
+
+                // 4. Если магазин скрыл заголовок защитой от ботов — достаём название из текста ссылки
+                if (!document.getElementById('add-title-input').value) {
+                    const slugMatch = rawInput.match(/\/product\/(?:[a-z0-9]{16}\/)?([a-z0-9-]+?)(?:-\d{6,12})?\/?(?:\?|$)/i);
+                    if (slugMatch && slugMatch[1]) {
+                        document.getElementById('add-title-input').value = slugMatch[1].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    }
+                }
+
+                statusEl.textContent = '✨ Ссылка разобрана! Проверьте название и укажите цену.';
+            } catch (e) {
+                statusEl.textContent = '⚠️ Не удалось автоматически прочитать сайт — введите название вручную.';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function getStoreStyleConfig(store) {
+            if (store === 'wb') return {
+                storeName: 'Wildberries',
+                badgeColor: 'bg-purple-600/90 text-white border-purple-400/40',
+                btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30',
+                borderColor: 'hover:border-purple-500/60',
+                icon: 'fa-bag-shopping',
+                specColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+            };
+            if (store === 'ozon') return {
+                storeName: 'Ozon',
+                badgeColor: 'bg-blue-600/90 text-white border-blue-400/40',
+                btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/30',
+                borderColor: 'hover:border-blue-500/60',
+                icon: 'fa-box-open',
+                specColor: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+            };
+            if (store === 'dns') return {
+                storeName: 'DNS',
+                badgeColor: 'bg-amber-500/90 text-slate-950 border-amber-300/50',
+                btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-amber-500/30',
+                borderColor: 'hover:border-amber-500/60',
+                icon: 'fa-microchip',
+                specColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+            };
+            return {
+                storeName: 'Офлайн / Табачная лавка',
+                badgeColor: 'bg-rose-600/95 text-white border-rose-400/60',
+                btnColor: 'bg-slate-800/90 text-rose-300 border border-rose-500/40',
+                borderColor: 'hover:border-rose-500/70',
+                icon: 'fa-fire-flame-curved',
+                specColor: 'bg-rose-600/30 text-rose-200 border-rose-500/60'
+            };
+        }
+
+        async function saveNewItem() {
+            const store = document.getElementById('add-store-input').value;
+            const title = document.getElementById('add-title-input').value.trim();
+            const price = document.getElementById('add-price-input').value.trim() || 'Цена по ссылке';
+            const article = document.getElementById('add-article-input').value.trim() || null;
+            const specTag = document.getElementById('add-spec-input').value.trim() || 'Новая хотелка ✨';
+            const url = document.getElementById('add-url-input').value.trim() || null;
+            const image = document.getElementById('add-image-input').value.trim() || 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=85';
+            const description = document.getElementById('add-desc-input').value.trim() || 'Желанный новогодний подарок из вишлиста Дениски! 🎄🎁';
+
+            if (!title) {
+                showToast('Пожалуйста, укажите название подарка!', 'fa-triangle-exclamation');
+                return;
+            }
+
+            const style = getStoreStyleConfig(store);
+            const newItem = {
+                id: `${store}-${Date.now()}`,
+                store,
+                storeName: style.storeName,
+                article,
+                price,
+                is18Plus: store === 'special18',
+                badgeColor: style.badgeColor,
+                btnColor: style.btnColor,
+                borderColor: style.borderColor,
+                icon: style.icon,
+                specTag,
+                specColor: style.specColor,
+                title,
+                description,
+                primaryImage: image,
+                fallbackImage: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=800&q=85',
+                url,
+                isCustomAdded: true
+            };
+
+            const added = getAddedItems();
+            added.push(newItem);
+            saveAddedItems(added);
+            closeAddModal();
+            renderWishlist();
+            showToast('Новый подарок добавлен в вишлист! 🎁', 'fa-plus');
+
+            try {
+                await fetch(activeScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'add_item', item: newItem })
+                });
+            } catch (e) {}
+        }
+
+        async function deleteAddedItem(itemId) {
+            if (!confirm('Удалить эту карточку из вишлиста?')) return;
+            const added = getAddedItems().filter(i => i.id !== itemId);
+            saveAddedItems(added);
+            renderWishlist();
+            showToast('Карточка удалена', 'fa-trash');
+
+            try {
+                await fetch(activeScriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'delete_item', id: itemId })
+                });
+            } catch (e) {}
+        }
+
+        // Генерация снежинок
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            const symbols = ['❄', '❅', '❆', '•'];
+            const count = 22;
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                const left = Math.random() * 100;
+                const duration = 8 + Math.random() * 12;
+                const delay = Math.random() * 8;
+                const size = 0.6 + Math.random() * 1.1;
+                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                html += `<div class="snowflake" style="left: ${left}%; font-size: ${size}rem; animation-duration: ${duration}s; animation-delay: ${delay}s;">${symbol}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // Инициализация при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            createSnowflakes();
+            renderWishlist();
+            syncWithSheet(false);
+            setInterval(() => syncWithSheet(false), 15000);
+        });
+    </script>
+</body>
+</html>
