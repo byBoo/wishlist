@@ -18,10 +18,19 @@
         .serif-title {
             font-family: 'Playfair Display', serif;
         }
+        /* Падающий снег */
         @keyframes snowfall {
-            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0.9; }
-            50% { transform: translateY(50vh) translateX(25px) rotate(180deg); }
-            100% { transform: translateY(105vh) translateX(-15px) rotate(360deg); opacity: 0.2; }
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translateY(50vh) translateX(25px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(105vh) translateX(-15px) rotate(360deg);
+                opacity: 0.2;
+            }
         }
         .snowflake {
             position: fixed;
@@ -32,6 +41,7 @@
             z-index: 1;
             animation: snowfall linear infinite;
         }
+        /* Стеклянный эффект и свечение */
         .card-glass {
             background: rgba(17, 24, 39, 0.78);
             backdrop-filter: blur(16px);
@@ -40,13 +50,22 @@
         .garland-glow {
             background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.18), rgba(245, 158, 11, 0.12), transparent 70%);
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Плавное скрытие скроллбара для табов */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-b from-slate-950 via-[#0f172a] to-[#131129] min-h-screen text-slate-100 relative overflow-x-hidden pb-24">
 
+    <!-- Фоновое праздничное свечение -->
     <div class="fixed inset-0 garland-glow pointer-events-none z-0"></div>
+
+    <!-- Анимированные снежинки -->
     <div id="snow-container" aria-hidden="true"></div>
 
     <!-- Всплывающее уведомление (Toast) -->
@@ -57,189 +76,10 @@
         <span id="toast-message" class="text-sm font-medium">Артикул скопирован!</span>
     </div>
 
-    <!-- Модальное окно добавления нового подарка по ссылке -->
-    <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-            <button onclick="closeAddModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                <i class="fa-solid fa-plus-circle text-emerald-400"></i>
-                Добавить подарок в вишлист
-            </h3>
-            <p class="text-xs text-slate-400 mb-4">Вставьте ссылку на WB, Ozon, DNS или просто артикул WB — мы постараемся автоматически подтянуть название, фото и цену!</p>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Ссылка на товар или артикул WB</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="add-url-input" placeholder="https://www.wildberries.ru/... или ссылка Ozon/DNS" class="flex-1 bg-slate-800/90 border border-slate-700 focus:border-emerald-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
-                        <button onclick="autoFillFromUrl()" id="autofill-btn" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs sm:text-sm font-bold transition-all shrink-0 flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>Заполнить</span>
-                        </button>
-                    </div>
-                    <p id="autofill-status" class="text-[11px] text-slate-400 mt-1.5 hidden"></p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Магазин</label>
-                        <select id="add-store-input" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                            <option value="wb">Wildberries</option>
-                            <option value="ozon">Ozon</option>
-                            <option value="dns">DNS</option>
-                            <option value="special18">Особое 18+ / Офлайн</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Цена (₽)</label>
-                        <input type="text" id="add-price-input" placeholder="Например: 3 490 ₽" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Артикул (необязательно)</label>
-                        <input type="text" id="add-article-input" placeholder="Например: 12345678" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Метка / Размер</label>
-                        <input type="text" id="add-spec-input" placeholder="Напр: Новая хотелка ✨" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Название подарка</label>
-                    <input type="text" id="add-title-input" placeholder="Название товара" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Ссылка на фото (URL)</label>
-                    <input type="url" id="add-image-input" placeholder="https://..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Описание и пожелания</label>
-                    <textarea id="add-desc-input" rows="2" placeholder="Почему это классный подарок..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none resize-none"></textarea>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-slate-800">
-                <button onclick="closeAddModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
-                    Отмена
-                </button>
-                <button onclick="saveNewItem()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-sm font-bold transition-colors shadow-lg shadow-emerald-500/20">
-                    Добавить в вишлист
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Модальное окно для замены фото, цены и редактирования текста -->
     <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl relative animate-fadeIn">
             <button onclick="closeEditModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
-                Настроить карточку
-            </h3>
-            <p class="text-xs text-slate-400 mb-5">Изменения сохранятся в облачной таблице для всех друзей.</p>
-            
-            <input type="hidden" id="edit-item-id">
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Название подарка</label>
-                    <input type="text" id="edit-title-input" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Цена подарка</label>
-                    <input type="text" id="edit-price-input" placeholder="Например: ~4 500 ₽" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Ссылка на картинку (URL)</label>
-                    <input type="url" id="edit-image-input" placeholder="https://..." class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Описание и пожелания</label>
-                    <textarea id="edit-desc-input" rows="3" class="w-full bg-slate-800/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors resize-none"></textarea>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-800">
-                <button onclick="resetItemCustomization()" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-2 py-2 transition-colors">
-                    Сбросить
-                </button>
-                <div class="flex gap-2">
-                    <button onclick="closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
-                        Отмена
-                    </button>
-                    <button onclick="saveItemCustomization()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold transition-colors shadow-lg shadow-amber-500/20">
-                        Сохранить
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Шапка сайта -->
-    <header class="max-w-5xl mx-auto px-4 pt-8 pb-6 text-center relative z-10">
-        <!-- Верхняя панель статуса синхронизации и добавления -->
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-6 bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-2xl backdrop-blur-md">
-            <div class="flex items-center gap-2 text-xs font-medium">
-                <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-                <span id="sync-text" class="text-slate-300">Синхронизация с Google Таблицей...</span>
-                <button onclick="syncFromGoogleSheet(true)" title="Обновить данные из таблицы" class="ml-1 text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="openAddModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-lg shadow-emerald-500/20">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Добавить подарок по ссылке</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-red-500/20 via-amber-500/20 to-emerald-500/20 border border-amber-400/30 rounded-full mb-5 text-amber-300 text-xs sm:text-sm font-semibold shadow-lg">
-            <i class="fa-solid fa-sleigh text-red-400 animate-bounce"></i>
-            <span>Официальная шпаргалка для Тайного Санты и друзей</span>
-            <i class="fa-solid fa-tree text-emerald-400"></i>
-        </div>
-
-        <h1 class="serif-title text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-amber-200 via-white to-red-300 bg-clip-text text-transparent drop-shadow-sm">
-            Новогодний Вишлист Дениски 🎄
-        </h1>
-
-        <p class="text-slate-300 text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
-            Друзья, чтобы вы не ломали голову, что мне подарить под ёлочку — я собрал здесь всё самое нужное: от чёткого зрения и крутых кроссовок до космического апгрейда ПК! Выбирайте, копируйте артикул в один клик и отмечайте бронь, чтобы подарки не повторились ✨
-        </p>
-
-        <!-- Панель фильтров -->
-        <div class="mt-7 flex flex-wrap items-center justify-center gap-2 sm:gap-3 no-scrollbar">
-            <button onclick="filterWishlist('all')" data-filter="all" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 flex items-center gap-2">
-                <i class="fa-solid fa-gifts"></i> <span>Все подарки</span>
-            </button>
-            <button onclick="filterWishlist('wb')" data-filter="wb" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-purple-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
-                <i class="fa-solid fa-bag-shopping text-purple-400"></i> <span>Wildberries</span>
-            </button>
-            <button onclick="filterWishlist('ozon')" data-filter="ozon" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-blue-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
-                <i class="fa-solid fa-box-open text-blue-400"></i> <span>Ozon</span>
-            </button>
-            <button onclick="filterWishlist('dns')" data-filter="dns" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-amber-900/50 text-slate-300 border border-slate-700/70 flex items-center gap-2">
-                <i class="fa-solid fa-microchip text-amber-400"></i> <span>DNS</span>
-            </button>
-            <button onclick="filterWishlist('special18')" data-filter="special18" class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-slate-800/80 hover:bg-rose-900/50 text-slate-300 border border-rose-500/40 flex items-center gap-2">
-                <i class="fa-solid fa-ban-smoking text-rose-400"></i> <span>Особое 18+</span>
-            </button>
-        </div>
-
-        <!-- Сортировка по цене и статистика -->
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-400">
-            <span id="stats-counter" class="px-3 py-1 rounded-lg bg-slate-900/70 border border-slate-800">Загрузка...</span>
-            <div class="flex items-center gap-1.5 bg-slate-900/70 border border-slate-800 px-3 py-1 rounded-lg">
-                <i class="fa-solid fa-sort text-amber-400"></i>
-                <span>
+            <h3 class="text-
